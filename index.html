@@ -1,323 +1,297 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Interativo - Convênios & Missão (Pres. Oaks)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes pulse-fast {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.98); }
-        }
-        .timer-warning {
-            animation: pulse-fast 0.6s infinite;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz: Convênios e Missão</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f4f5fb; --card:#ffffff; --text:#1b1f3a; --muted:#5b6082; --line:#dfe2f0;
+  --accent:#4f46e5; --accent2:#0891b2; --ok:#059669; --bad:#e11d48; --warn:#d97706; --opt:#f7f8fd;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0b1020; --card:#151b33; --text:#eef0ff; --muted:#9aa3c7; --line:#283055;
+    --accent:#818cf8; --accent2:#22d3ee; --ok:#34d399; --bad:#fb7185; --warn:#fbbf24; --opt:#0f1530;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0b1020; --card:#151b33; --text:#eef0ff; --muted:#9aa3c7; --line:#283055;
+  --accent:#818cf8; --accent2:#22d3ee; --ok:#34d399; --bad:#fb7185; --warn:#fbbf24; --opt:#0f1530;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;min-height:100vh}
+.wrap{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 10px 30px rgba(20,20,60,.08)}
+.hidden{display:none!important}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+h1{font-size:26px;line-height:1.2;margin:0 0 14px}
+h2{font-size:20px;line-height:1.35;margin:0}
+.scripture{border-left:4px solid var(--accent2);background:var(--opt);border-radius:0 14px 14px 0;padding:16px 18px;margin:18px 0}
+.scripture p{margin:0 0 8px;font-size:17px;font-style:italic}
+.scripture cite{font-style:normal;font-weight:700;color:var(--accent2);font-size:14px}
+.rules{color:var(--muted);font-size:14px;margin:0 0 20px;padding-left:18px}
+.btn{width:100%;border:0;border-radius:16px;padding:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(90deg,var(--accent),var(--accent2));cursor:pointer}
+.btn.alt{background:var(--opt);color:var(--text);border:1px solid var(--line)}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:700;color:var(--muted)}
+.timer{font-variant-numeric:tabular-nums;font-size:18px;color:var(--accent2)}
+.timer.low{color:var(--bad);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:20px}
+.bar>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));transform-origin:left}
+.bar.low>i{background:var(--bad)}
+.progress{display:flex;gap:4px;margin-bottom:16px}
+.progress b{flex:1;height:4px;border-radius:4px;background:var(--line)}
+.progress b.done{background:var(--accent)}
+.opts{display:grid;gap:10px;margin-top:18px}
+.opt{text-align:left;width:100%;padding:15px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--opt);color:var(--text);font-size:15.5px;cursor:pointer;font-family:inherit}
+.opt:active{border-color:var(--accent);background:var(--card)}
+.score{font-size:56px;font-weight:800;text-align:center;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;margin:6px 0}
+.center{text-align:center}
+.muted{color:var(--muted)}
+.rev{border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:12px;background:var(--opt)}
+.rev h3{margin:0 0 8px;font-size:15px}
+.rev .l{font-size:14px;margin:4px 0}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}.wr{color:var(--warn);font-weight:600}
+.rev .why{font-size:13.5px;color:var(--muted);margin-top:8px}
+.msg{margin:14px 0 0;padding:16px 18px;border-radius:16px;border:1px solid var(--line);background:var(--opt);font-size:16px;font-weight:600;text-align:center}
+.mission{margin:12px 0 0;padding:16px 18px;border-radius:16px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;text-align:center;font-size:16px;font-weight:700}
+.mission small{display:block;font-weight:500;opacity:.9;margin-bottom:4px;font-size:13px;letter-spacing:.04em;text-transform:uppercase}
+.src{font-size:12.5px;color:var(--muted);margin-top:18px;text-align:center}
+.src a{color:var(--accent)}
+</style>
 </head>
-<body class="bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-slate-100 min-h-screen flex flex-col justify-between font-sans selection:bg-indigo-500 selection:text-white">
+<body>
+<div class="wrap">
 
-    <!-- Top Canvas Header -->
-    <header class="w-full py-5 px-6 bg-slate-900/90 backdrop-blur-md border-b border-indigo-500/20 shadow-xl flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <span class="bg-indigo-600 text-white font-bold px-3 py-1.5 rounded-xl text-xs uppercase tracking-wider shadow-inner">Cara a Cara</span>
-            <h1 class="text-lg md:text-xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-cyan-200 to-white">
-                Convênios & Missão
-            </h1>
-        </div>
-        <div class="text-xs font-semibold text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full border border-slate-700">
-            Pres. Dallin H. Oaks
-        </div>
-    </header>
+  <!-- Escritura inicial -->
+  <section id="intro" class="card">
+    <span class="tag" style="margin-bottom:0">Cara a Cara • Convênios e Missão</span>
+    <div class="scripture">
+      <p>“Eleva o coração e regozija-te, pois é chegada a hora de tua missão; e tua língua será desatada e anunciarás boas novas de grande alegria a esta geração.”</p>
+      <cite>Doutrina e Convênios 31:3</cite>
+    </div>
+    <ul class="rules">
+      <li>Responda perguntas, com tempo curto em cada uma.</li>
+      <li>Ao acabar o tempo, a pergunta é perdida.</li>
+      <li>O resultado e as respostas corretas aparecem só no final.</li>
+    </ul>
+    <button class="btn" onclick="startQuiz()">Começar o quiz</button>
+  </section>
 
-    <!-- Main Workspace Container -->
-    <main class="container mx-auto px-4 py-8 max-w-xl flex-grow flex flex-col justify-center">
+  <!-- Pergunta -->
+  <section id="quiz" class="card hidden">
+    <div class="progress" id="progress"></div>
+    <div class="top">
+      <span id="counter"></span>
+      <span class="timer" id="timer"></span>
+    </div>
+    <div class="bar" id="bar"><i id="barfill"></i></div>
+    <h2 id="qtext"></h2>
+    <div class="opts" id="opts"></div>
+  </section>
 
-        <!-- Welcome View -->
-        <div id="welcome-screen" class="bg-slate-900/80 backdrop-blur-2xl border border-indigo-500/30 rounded-3xl p-8 shadow-2xl text-center space-y-6">
-            <div class="inline-flex p-4 bg-gradient-to-tr from-indigo-600/30 to-cyan-500/30 rounded-2xl text-indigo-400 shadow-inner mb-2 border border-indigo-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
-            </div>
-            <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Debate Jovem: Por que Convênios?</h2>
-            <p class="text-slate-300 text-sm md:text-base leading-relaxed">
-                Bem-vindo ao espaço de diálogo interativo. Cada pergunta possui um limite de **25 segundos** para respostas instintivas focadas nas dores e nos desafios reais da preparação missionária.
-            </p>
-            <div class="pt-2">
-                <button onclick="startQuiz()" class="w-full py-4 bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-indigo-500/25 transform hover:-translate-y-0.5 transition duration-200 text-base">
-                    Iniciar Dinâmica 🚀
-                </button>
-            </div>
-        </div>
+  <!-- Resultado -->
+  <section id="result" class="card hidden">
+    <span class="tag">Resultado</span>
+    <div class="score" id="score"></div>
+    <div class="msg" id="scoremsg"></div>
+    <div class="mission" id="mission"></div>
+    <div id="review"></div>
+    <div style="margin-top:20px;display:grid;gap:10px">
+      <button class="btn" onclick="startQuiz()">Jogar novamente</button>
+    </div>
+    <p class="src">Base: mensagem do Presidente Dallin H. Oaks na conferência geral de abril de 2024
+      (<a href="https://www.churchofjesuschrist.org/study/general-conference/2024/04/47oaks?lang=por" target="_blank" rel="noopener">link</a>) e Doutrina e Convênios 109.</p>
+  </section>
 
-        <!-- Active Quiz View -->
-        <div id="quiz-screen" class="hidden bg-slate-900/80 backdrop-blur-2xl border border-indigo-500/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
-            
-            <!-- Quiz Status bar -->
-            <div class="flex justify-between items-center border-b border-slate-800 pb-4">
-                <span id="question-counter" class="text-xs font-bold uppercase tracking-widest text-indigo-400">
-                    Pergunta 1 de 6
-                </span>
-                <div id="timer-box" class="flex items-center space-x-2 bg-slate-950/80 px-4 py-1.5 rounded-xl border border-slate-800 shadow-inner">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span id="timer-display" class="font-mono font-bold text-cyan-300 text-sm">25s</span>
-                </div>
-            </div>
+</div>
 
-            <!-- Question Area -->
-            <div class="min-h-[90px] flex items-center">
-                <h3 id="question-text" class="text-lg md:text-xl font-bold text-white leading-snug">
-                    <!-- Dynamic Text -->
-                </h3>
-            </div>
+<script>
+/* Cada pergunta: t = segundos, c = índice da resposta correta ANTES de embaralhar */
+const QUESTIONS = [
+  { q:"O que é um convênio ou juramento?", t:15,
+    o:["Um compromisso para cumprir certas responsabilidades.",
+       "Uma promessa entre amigos que pode ser desfeita quando as circunstâncias mudam.",
+       "Uma lista de regras criada pela Igreja para controlar o comportamento dos membros.",
+       "Um desejo sincero de ser uma pessoa melhor no futuro, sem obrigação definida."], c:0,
+    why:"O Presidente Oaks ensinou que um convênio é um compromisso de cumprir certas responsabilidades, e que Deus também se compromete a abençoar quem as cumpre." },
 
-            <!-- Selection Options -->
-            <div id="options-container" class="space-y-3">
-                <!-- Dynamic Options -->
-            </div>
+  { q:"Qual é o primeiro convênio que fazemos com Deus?", t:12,
+    o:["O batismo.",
+       "O casamento no templo.",
+       "A investidura no templo.",
+       "A ordenação ao sacerdócio."], c:0,
+    why:"O batismo é o primeiro convênio que fazemos com Deus e a porta de entrada para as demais bênçãos do evangelho." },
 
-            <!-- Explanatory Rationale Box (Revealed on choice/timeout) -->
-            <div id="rationale-box" class="hidden bg-indigo-950/80 border border-indigo-500/40 rounded-2xl p-5 text-sm text-indigo-200 space-y-3 shadow-inner">
-                <p class="font-bold text-cyan-300 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Perspectiva do Presidente Oaks:
-                </p>
-                <p id="rationale-text" class="leading-relaxed"></p>
-                <div class="pt-2 text-right">
-                    <button onclick="nextQuestion()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs tracking-wider uppercase transition shadow-md">
-                        Próxima Pergunta ➔
-                    </button>
-                </div>
-            </div>
+  { q:"No batismo, que convênio fazemos com Deus?", t:12,
+    o:["Tomar sobre nós o nome de Jesus Cristo, guardar os mandamentos e servi-Lo.",
+       "Servir uma missão de tempo integral obrigatoriamente.",
+       "Frequentar a Igreja apenas aos domingos.",
+       "Nunca cometer nenhum erro pelo resto da vida."], c:0,
+    why:"O convênio batismal une o nosso compromisso de seguir o Salvador à promessa de Deus de nos abençoar." },
 
-        </div>
+  { q:"Segundo o Presidente Oaks, os convênios nos ligam principalmente a quem?", t:12,
+    o:["A Jesus Cristo, fonte de poder para vencermos as dificuldades.",
+       "Aos líderes locais, que fiscalizam o nosso progresso.",
+       "À tradição e à cultura da nossa família.",
+       "A um grupo de amigos que pensa como nós."], c:0,
+    why:"Fé em Jesus Cristo é o centro dos convênios: por meio deles nos ligamos ao Salvador e recebemos Seu poder." },
 
-        <!-- Completion View -->
-        <div id="result-screen" class="hidden bg-slate-900/80 backdrop-blur-2xl border border-indigo-500/30 rounded-3xl p-8 shadow-2xl text-center space-y-6">
-            <div class="inline-flex p-4 bg-emerald-500/20 rounded-2xl text-emerald-400 mb-2 border border-emerald-500/30">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-            </div>
-            <h2 class="text-2xl md:text-3xl font-bold text-white tracking-tight">Aquecimento Concluído!</h2>
-            <p class="text-slate-300 text-sm md:text-base leading-relaxed">
-                As ideias e barreiras foram mapeadas. Este é o momento perfeito para abrir o debate aberto, discutir as dores reais da preparação e partilhar seu testemunho pessoal!
-            </p>
-            <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 text-sm text-cyan-300 font-medium italic">
-                "Os convênios de Deus não são algemas para nos prender, mas a fonte de poder espiritual para nos libertar."
-            </div>
-            <div class="pt-2">
-                <button onclick="restartQuiz()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl shadow transition">
-                    Reiniciar Quiz para Outro Grupo 🔄
-                </button>
-            </div>
-        </div>
+  { q:"Em qual local somos investidos com poder do alto?", t:12,
+    o:["No templo, a Casa do Senhor.",
+       "Na pia batismal.",
+       "Na capela.",
+       "Na bênção patriarcal."], c:0,
+    why:"No templo, a Casa do Senhor, fazemos convênios e recebemos poder do alto para a vida e para a obra missionária." },
 
-    </main>
+  { q:"O que é o convênio abraâmico?", t:15,
+    o:["O convênio em que Deus prometeu grandes bênçãos a Abraão e à sua família, estendidas a toda a semente de Abraão.",
+       "Um acordo de paz feito entre Abraão e os povos vizinhos.",
+       "Um convênio exclusivo dos descendentes literais de Abraão, sem acesso para os demais.",
+       "Uma regra da lei de Moisés sobre sacrifícios de animais."], c:0,
+    why:"Segundo o site da Igreja, Deus prometeu a Abraão posteridade numerosa, o evangelho e o sacerdócio, e por meio de sua semente todas as famílias da Terra seriam abençoadas. Quem obedece às leis e ordenanças do evangelho pode receber essas bênçãos, mesmo sem ser descendente literal." },
 
-    <!-- Footer Area -->
-    <footer class="text-center py-4 text-xs text-slate-500 border-t border-slate-900">
-        Ferramenta de Apoio Cara a Cara • Jovens (16-25 anos)
-    </footer>
+  { q:"Como renovamos toda semana os convênios que fizemos no batismo?", t:12,
+    o:["Participando do sacramento com o coração sincero.",
+       "Repetindo a oração pessoal antes de dormir.",
+       "Pagando o dízimo no fim do mês.",
+       "Sendo entrevistado pelo bispo todo domingo."], c:0,
+    why:"Ao tomar o sacramento, renovamos o compromisso de tomar sobre nós o nome de Cristo, lembrar-nos d’Ele e guardar Seus mandamentos." },
 
-    <!-- Interactive Logic Script -->
-    <script>
-        const quizData = [
-            {
-                question: "Quando você ouve a palavra 'convênio' na Igreja, qual é a sua sensação mais comum?",
-                options: [
-                    { text: "Sensação de rigidez, cobrança e perda de liberdade pessoal.", isCorrect: false, rationale: "Uma dor muito comum entre jovens. O Pres. Oaks esclarece que os convênios autênticos elevam nossa capacidade, agindo como fonte de poder e não como restrição punitiva." },
-                    { text: "Uma parceria espiritual sagrada que me dá direção e poder real.", isCorrect: true, rationale: "Exato! Convênios com Deus abrem canais para receber suporte divino e energia espiritual na rotina diária." },
-                    { text: "Apenas uma formalidade burocrática sem impacto prático no dia a dia.", isCorrect: false, rationale: "Muitos pensam assim até enfrentarem grandes provações na missão, onde percebem que a força humana isolada não é suficiente." },
-                    { text: "Algo que só importa para pessoas mais velhas ou líderes.", isCorrect: false, rationale: "O momento crucial de firmar e compreender convênios é exatamente na juventude, preparando-se para a vida adulta e o campo missionário." }
-                ],
-                hint: "Pense na diferença entre obrigações vazias e compromissos que nos fortalecem."
-            },
-            {
-                question: "Diante das pressões da sociedade e do futuro, qual costuma ser o maior medo em relação à missão?",
-                options: [
-                    { text: "O medo da rejeição diária e de não corresponder às expectativas.", isCorrect: true, rationale: "Essa dor da inadequação é real. O convênio missionário nos lembra que o sucesso não depende apenas de nossa força, mas do poder do Senhor." },
-                    { text: "O medo de perder os amigos e conexões sociais de casa.", isCorrect: false, rationale: "Embora seja um desafio temporário, a missão expande nossa capacidade de criar laços profundos e eternos." },
-                    { text: "O receio de que as regras rígidas limitem demais a autonomia.", isCorrect: false, rationale: "As normas servem para focar nossa energia e nos proteger espiritualmente no campo." },
-                    { text: "A preocupação financeira ou burocrática com os papéis.", isCorrect: false, rationale: "O Senhor providencia caminhos quando priorizamos Seus propósitos e convênios." }
-                ],
-                hint: "Pense no sentimento de inadequação ou medo de falhar perante os outros."
-            },
-            {
-                question: "Segundo o Presidente Dallin H. Oaks, qual é a principal finalidade dos convênios com Deus?",
-                options: [
-                    { text: "Garantir status social e reconhecimento dentro da comunidade.", isCorrect: false, rationale: "Convênios não são sobre aparências ou status perante os homens, mas sobre nossa ligação íntima com o Criador." },
-                    { text: "Nos ligar ao poder de Jesus Cristo para vencermos as dificuldades.", isCorrect: true, rationale: "Perfeito! O convênio é o canal oficial pelo qual o poder habilitador e redentor do Salvador flui para nos sustentar." },
-                    { text: "Cumprir uma tabela rígida para evitar punições divinas.", isCorrect: false, rationale: "O evangelho não é uma lista fria de punições, mas um convênio de amor e transformação de caráter." },
-                    { text: "Anular o arbítrio pessoal em troca de obediência cega.", isCorrect: false, rationale: "Deus jamais anula nosso arbítrio; os convênios aumentam nossa capacidade moral de escolher o bem com poder." }
-                ],
-                hint: "Lembre-se de como o Salvador nos capacita através de Sua graça."
-            },
-            {
-                question: "Por que um jovem precisa valorizar seus convênios antes mesmo de cruzar a porta do Centro de Treinamento Missionário (CTM)?",
-                options: [
-                    { text: "Porque a armadura espiritual precisa ser construída antes, e não de última hora.", isCorrect: true, rationale: "Exatamente! A missão testa profundamente a fundação espiritual. O que você vive hoje sustenta o missionário de amanhã." },
-                    { text: "Para passar na entrevista com o bispo sem nenhuma cobrança.", isCorrect: false, rationale: "A entrevista é um marco de progresso espiritual individual, não uma barreira burocrática." },
-                    { text: "Para impressionar os líderes de ala e ganhar chamados de destaque.", isCorrect: false, rationale: "O foco do convênio é o discipulado pessoal e o serviço ao próximo, nunca cargos." },
-                    { text: "Porque os líderes exigem isso apenas para preencher papéis.", isCorrect: false, rationale: "O valor da preparação por convênio é puramente espiritual e eterno." }
-                ],
-                hint: "Pense em como um atleta treina antes de entrar na competição."
-            },
-            {
-                question: "Quando o desânimo bate forte na rotina missionária ou na preparação, qual conceito de Oaks mais nos sustenta?",
-                options: [
-                    { text: "Lembra-nos que estamos sob convênio e que Deus cumpre Sua promessa de nos fortalecer.", isCorrect: true, rationale: "Exato. Quando cumprimos nossa parte, o Senhor está comprometido por convênio a derramar Sua graça e força." },
-                    { text: "Trabalhar o dobro de horas para esquecer os problemas emocionais.", isCorrect: false, rationale: "Esforço isolado sem direção espiritual gera exaustão mental e física." },
-                    { text: "Esperar o tempo passar até o fim do prazo estipulado.", isCorrect: false, rationale: "A missão é uma experiência viva de transformação, não uma sentença a cumprir." },
-                    { text: "Comparar nosso ritmo com o de outros colegas de destaque.", isCorrect: false, rationale: "Comparações geram ansiedade desnecessária; nosso foco deve ser o Salvador." }
-                ],
-                hint: "Pense na parceria de aliança mútua entre você e o Pai Celestial."
-            },
-            {
-                question: "Qual deve ser a nossa abordagem ao conversar com jovens menos ativos sobre convênios?",
-                options: [
-                    { text: "Apontar erros do passado e cobrar mudanças imediatas de comportamento.", isCorrect: false, rationale: "Apontar falhas afasta as pessoas. O convênio é um convite de amor e resgate, nunca de julgamento." },
-                    { text: "Demonstrar empatia e mostrar que os convênios trazem o poder de Cristo para suas dores.", isCorrect: true, rationale: "Perfeito! O objetivo é acolher, entender as dores reais deles e convidá-los a experimentar o poder libertador de Cristo." },
-                    { text: "Exigir que sigam rigorosamente todas as tradições culturais da ala.", isCorrect: false, rationale: "Devemos focar na doutrina pura de Cristo e nos convênios essenciais." },
-                    { text: "Falar apenas de regras rígidas para impor disciplina imediata.", isCorrect: false, rationale: "Focar em restrições afasta quem já está ferido ou distante." }
-                ],
-                hint: "Pense em como o próprio Salvador acolhia as pessoas em suas necessidades."
-            }
-        ];
+  { q:"Por que os convênios são necessários?", t:15,
+    o:["Porque é por meio deles que nos ligamos a Deus e recebemos as bênçãos e o poder que Ele deseja nos dar.",
+       "Porque boas intenções, sem compromisso, já bastam para receber as bênçãos.",
+       "Porque Deus precisa de um registro para nos vigiar e nos punir.",
+       "Porque mostram aos outros que somos mais justos que eles."], c:0,
+    why:"Deus abençoa Seus filhos por meio de um relacionamento de convênio: Ele promete, nós nos comprometemos." },
 
-        let currentQuestionIndex = 0;
-        let timer = null;
-        let timeLeft = 25;
-        const TIME_LIMIT = 25;
+  { q:"Como os convênios podem ajudar um missionário que enfrenta rejeição no dia a dia?", t:15,
+    o:["Ele sabe que não está sozinho: Deus prometeu fortalecer quem cumpre sua parte.",
+       "Os convênios garantem que ninguém vai rejeitá-lo.",
+       "Ele passa a depender apenas da própria força de vontade.",
+       "Ele pode reduzir o esforço, porque o convênio faz todo o trabalho."], c:0,
+    why:"O convênio conecta o missionário ao poder do Salvador. Ele ainda precisa agir, mas não trabalha sozinho." },
 
-        const welcomeScreen = document.getElementById('welcome-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const questionCounter = document.getElementById('question-counter');
-        const timerDisplay = document.getElementById('timer-display');
-        const timerBox = document.getElementById('timer-box');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const rationaleBox = document.getElementById('rationale-box');
-        const rationaleText = document.getElementById('rationale-text');
+  { q:"Um jovem se sente despreparado e com medo de falhar na missão. O que mais o ajuda a vencer essa dificuldade agora?", t:18,
+    o:["Começar hoje a guardar os convênios, orar e estudar as escrituras, confiando em Cristo, e conversar com o bispo.",
+       "Esperar chegar ao Centro de Treinamento Missionário para se preparar.",
+       "Esconder o medo de todos e tentar resolver sozinho.",
+       "Adiar a decisão até se sentir perfeito."], c:0,
+    why:"A preparação espiritual acontece antes da missão. Os convênios guardados hoje sustentam o missionário de amanhã." },
 
-        function startQuiz() {
-            welcomeScreen.classList.add('hidden');
-            resultScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            currentQuestionIndex = 0;
-            loadQuestion();
-        }
+  { q:"Em D&C 109, na oração dedicatória do templo, o que se pede para os servos do Senhor que saem da Sua casa?", t:18,
+    o:["Que saiam armados com o poder de Deus, com o Seu nome sobre eles e Seus anjos ao redor.",
+       "Que nunca enfrentem oposição ou provações.",
+       "Que tenham sucesso material imediato.",
+       "Que fiquem no templo e evitem o contato com o mundo."], c:0,
+    why:"D&C 109:22 fala de sair da casa do Senhor “armados com Seu poder”, com Seu nome e glória sobre eles e anjos os guardando." },
 
-        function loadQuestion() {
-            clearInterval(timer);
-            timeLeft = TIME_LIMIT;
-            updateTimerDisplay();
-            startTimer();
+  { q:"Segundo D&C 109, o que recebem aqueles que saem do templo com o poder do alto?", t:18,
+    o:["Proteção e força divinas para cumprir a obra, sem retirar a necessidade de agir com fé.",
+       "Uma vida livre de qualquer desafio ou tristeza.",
+       "A dispensa do trabalho e do estudo das escrituras.",
+       "O poder de forçar as pessoas a aceitar a mensagem."], c:0,
+    why:"O poder do alto fortalece e protege, mas o arbítrio das pessoas é respeitado e o missionário continua a trabalhar com fé." },
 
-            rationaleBox.classList.add('hidden');
-            const q = quizData[currentQuestionIndex];
-            questionCounter.innerText = `Pergunta ${currentQuestionIndex + 1} de ${quizData.length}`;
-            questionText.innerText = q.question;
+  { q:"Antes da missão, você sente pressão dos amigos e tentação de deixar a preparação de lado. O que os convênios ensinam a fazer?", t:18,
+    o:["Lembrar quem sou e a quem prometi ser fiel, e escolher agora o que me prepara para servir.",
+       "Deixar tudo como está e resolver isso no campo missionário.",
+       "Afastar-me de todos e evitar qualquer amizade.",
+       "Concluir que um deslize me impede de continuar."], c:0,
+    why:"Convênios dão identidade e propósito. Eles nos ajudam a decidir com antecedência e a nos arrependermos quando erramos, sem desistir." },
 
-            optionsContainer.innerHTML = '';
-            
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80 hover:border-indigo-500 hover:bg-slate-950 transition duration-150 text-slate-200 font-medium text-sm md:text-base flex items-center justify-between group shadow-sm";
-                btn.innerHTML = `<span>${opt.text}</span><span class="text-xs text-slate-600 group-hover:text-indigo-400 font-bold ml-2">#${index + 1}</span>`;
-                btn.onclick = () => selectOption(opt, btn);
-                optionsContainer.appendChild(btn);
-            });
-        }
+  { q:"Você errou e teme não estar apto para servir. Qual pensamento está mais de acordo com os convênios?", t:18,
+    o:["Posso me arrepender e seguir em frente, pois o Salvador me fortalece à medida que guardo meus convênios.",
+       "Só posso servir se nunca tiver errado.",
+       "Não adianta tentar, pois já estraguei tudo.",
+       "Devo esconder o erro para que ninguém saiba."], c:0,
+    why:"O convênio inclui a promessa do Salvador de nos ajudar. O arrependimento sincero nos permite continuar avançando." }
+];
 
-        function startTimer() {
-            timerBox.classList.remove('timer-warning', 'border-red-500');
-            timerBox.classList.add('border-slate-800');
+const $ = id => document.getElementById(id);
+let idx = 0, answers = [], deck = [], raf = null, endAt = 0, curDur = 0, locked = false;
 
-            timer = setInterval(() => {
-                timeLeft--;
-                updateTimerDisplay();
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-                if (timeLeft <= 8) {
-                    timerBox.classList.add('timer-warning', 'border-red-500/80');
-                }
+function startQuiz(){
+  idx = 0; answers = [];
+  deck = QUESTIONS.map(q => ({
+    q:q.q, t:q.t, why:q.why,
+    opts: shuffle(q.o.map((text,i)=>({text, ok:i===q.c})))
+  }));
+  $('intro').classList.add('hidden');
+  $('result').classList.add('hidden');
+  $('quiz').classList.remove('hidden');
+  const p = $('progress'); p.innerHTML = deck.map(()=>'<b></b>').join('');
+  load();
+}
 
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    handleTimeout();
-                }
-            }, 1000);
-        }
+function load(){
+  locked = false;
+  const d = deck[idx];
+  $('counter').textContent = `Pergunta ${idx+1} de ${deck.length}`;
+  $('qtext').textContent = d.q;
+  [...$('progress').children].forEach((b,i)=>b.classList.toggle('done', i<idx));
+  const box = $('opts'); box.innerHTML = '';
+  d.opts.forEach((o,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt'; b.textContent = o.text;
+    b.onclick = () => choose(i);
+    box.appendChild(b);
+  });
+  curDur = d.t*1000; endAt = performance.now() + curDur;
+  cancelAnimationFrame(raf); tick();
+}
 
-        function updateTimerDisplay() {
-            timerDisplay.innerText = `${timeLeft}s`;
-        }
+function tick(){
+  const left = Math.max(0, endAt - performance.now());
+  $('timer').textContent = Math.ceil(left/1000) + 's';
+  $('barfill').style.transform = `scaleX(${left/curDur})`;
+  const low = left <= 5000;
+  $('timer').classList.toggle('low', low);
+  $('bar').classList.toggle('low', low);
+  if(left <= 0){ if(!locked) choose(null); return; }
+  raf = requestAnimationFrame(tick);
+}
 
-        function handleTimeout() {
-            const buttons = optionsContainer.getElementsByTagName('button');
-            for (let btn of buttons) {
-                btn.disabled = true;
-                btn.classList.add('opacity-40', 'cursor-not-allowed');
-            }
-            const q = quizData[currentQuestionIndex];
-            const correctOpt = q.options.find(o => o.isCorrect);
-            
-            for (let i = 0; i < q.options.length; i++) {
-                if (q.options[i].isCorrect) {
-                    buttons[i].classList.remove('bg-slate-950/60', 'border-slate-800/80', 'opacity-40');
-                    buttons[i].classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-200');
-                }
-            }
+function choose(i){
+  if(locked) return; locked = true;
+  cancelAnimationFrame(raf);
+  answers[idx] = i;
+  idx++;
+  if(idx < deck.length) load(); else finish();
+}
 
-            rationaleText.innerText = `O tempo esgotou! A resposta ideal é: "${correctOpt.text}". ${correctOpt.rationale}`;
-            rationaleBox.classList.remove('hidden');
-        }
-
-        function selectOption(selectedOpt, btnElement) {
-            clearInterval(timer);
-            const buttons = optionsContainer.getElementsByTagName('button');
-            for (let btn of buttons) {
-                btn.disabled = true;
-                btn.classList.add('cursor-not-allowed');
-            }
-
-            const q = quizData[currentQuestionIndex];
-
-            q.options.forEach((opt, idx) => {
-                if (opt.isCorrect) {
-                    buttons[idx].classList.remove('bg-slate-950/60', 'border-slate-800/80');
-                    buttons[idx].classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-200');
-                } else if (buttons[idx] === btnElement && !opt.isCorrect) {
-                    buttons[idx].classList.remove('bg-slate-950/60', 'border-slate-800/80');
-                    buttons[idx].classList.add('bg-rose-950/80', 'border-rose-500', 'text-rose-200');
-                } else {
-                    buttons[idx].classList.add('opacity-30');
-                }
-            });
-
-            rationaleText.innerText = selectedOpt.rationale;
-            rationaleBox.classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
-                loadQuestion();
-            } else {
-                quizScreen.classList.add('hidden');
-                resultScreen.classList.remove('hidden');
-            }
-        }
-
-        function restartQuiz() {
-            startQuiz();
-        }
-    </script>
+function finish(){
+  $('quiz').classList.add('hidden');
+  $('result').classList.remove('hidden');
+  let hits = 0;
+  const rows = deck.map((d,n)=>{
+    const a = answers[n];
+    const correct = d.opts.find(o=>o.ok).text;
+    const ok = a!==null && d.opts[a].ok;
+    if(ok) hits++;
+    const status = ok ? '<span class="ok">Correta</span>' : (a===null ? '<span class="wr">Tempo esgotado</span>' : '<span class="bad">Incorreta</span>');
+    return `<div class="rev"><h3>${n+1}. ${d.q} — ${status}</h3>
+      ${a!==null ? `<div class="l">Sua resposta: ${d.opts[a].text}</div>` : ''}
+      ${ok ? '' : `<div class="l ok">Resposta correta: ${correct}</div>`}
+      <div class="why">${d.why}</div></div>`;
+  }).join('');
+  $('score').textContent = `${hits}/${deck.length}`;
+  $('scoremsg').textContent = hits>=9
+    ? "O Senhor não escolhe os preparados, mas prepara os escolhidos. Você já é um missionário, continue assim."
+    : "O Senhor não escolhe os preparados, mas prepara os escolhidos. Você já é um missionário, prepare-se mais.";
+  const places=["Japão 🇯🇵","Portugal 🇵🇹","Moçambique 🇲🇿","Filipinas 🇵🇭","Chile 🇨🇱","Angola 🇦🇴","Estados Unidos 🇺🇸","Itália 🇮🇹","Coreia do Sul 🇰🇷","Argentina 🇦🇷","Nova Zelândia 🇳🇿","Cabo Verde 🇨🇻","Brasil 🇧🇷"];
+  const pick = places[Math.floor(Math.random()*places.length)];
+  $('mission').innerHTML = `<small>Brincadeiras à parte</small>Eu acho que você servirá em ${pick}!`;
+  $('review').innerHTML = rows;
+  window.scrollTo({top:0});
+}
+</script>
 </body>
 </html>
